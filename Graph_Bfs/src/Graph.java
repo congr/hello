@@ -3,6 +3,8 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import Main.Graph.Node;
+
 public class Graph {
 
 	// adjacent List
@@ -15,15 +17,15 @@ public class Graph {
 
 	class Node {
 		int toVertex;
-		int cost;
+		int weight;
 
-		public Node(int toV, int cost) {
+		public Node(int toV, int weight) {
 			this.toVertex = toV;
-			this.cost = cost;
+			this.weight = weight;
 		}
 
 		public String toString() {
-			return " " + this.toVertex + " (" + this.cost + ") \t";
+			return " " + this.toVertex + " (" + this.weight + ") \t";
 		}
 	}
 
@@ -113,7 +115,7 @@ public class Graph {
 			//System.out.println(node.toVertex + " vCost: " + visitedCost[here]);
 			q.remove();
 			
-			for (int j = 0; j < adj[here].size(); j++) {
+			for (int j = 0, len = adj[here].size(); j < len; j++) {
 				int there = adj[here].get(j).toVertex; //인접한 점.
 				if (visitedCost[there] == 0) { // 방문전이라면,
 					if (visitedCost[there] == v2) // finish지점이라면,
@@ -151,7 +153,7 @@ public class Graph {
 			
 			q.remove();
 			
-			for (int j = 0; j < adj[here].size(); j++) {
+			for (int j = 0, len = adj[here].size(); j < len; j++) {
 				int there = adj[here].get(j).toVertex; //인접한 점.
 				if (visitedCost[there] == 0) { // 방문전이라면,
 					visitedCost[there] = visitedCost[here] >0 ? visitedCost[here] + 1 : visitedCost[here]-1; // 여기까지 걸린 cost +1.
@@ -176,5 +178,57 @@ public class Graph {
 	int sgn (int x) {
 		if (x> 0) return 1;
 		else return -1;
+	}
+	
+	int[] minWeight;
+
+	void findMinWeightPath(int k) {
+		System.out.println("findMinWeightPath");
+		Arrays.fill(visitedCost, 0, visitedCost.length, 0);
+		minWeight = new int[vertexCnt + 1];
+
+		visitedCost[k] = 1;
+		q.add(new Node(k, 0)); // 시작
+
+		while (!q.isEmpty()) {
+			Node n = q.peek();
+			int popV = n.toVertex; // 큐에서 제거되는 V
+			// System.out.println(n.toVertex + " vCost: " + visitedCost[popV]);
+			q.remove();
+
+			// 제거되는V점(popV)의 인접한 점(ArrayLists)들을 검사.
+			for (int j = 0, len = adj[popV].size(); j < len; j++) { 
+				int t = adj[popV].get(j).toVertex; // 추가할 점.
+				int weight = adj[popV].get(j).weight; // popV <-> t 간선의 weight
+
+				if (visitedCost[t] == 0) {// 첫 방문.
+					minWeight[t] = weight + minWeight[popV];
+					visitedCost[t] = visitedCost[popV] + 1;
+					parent[t] = popV;// parent
+					q.add(adj[popV].get(j));
+				} else {
+					// minWeight 보다 작은 값이라면 갱
+					if (minWeight[t] > weight + minWeight[popV]) { 
+						minWeight[t] = weight + minWeight[popV];
+						parent[t] = popV;
+					}
+				}
+			}
+		}
+
+		// 최소 가중치로 인한 visited edge count
+		System.out.println("edge count : " + visitedCost[visitedCost.length - 1]);
+		System.out.println("minWeight : " + minWeight[minWeight.length - 1]);
+
+		// parent 배열.
+		//for (int i = 0; i < vertexCnt + 1; i++)
+		//	System.out.println(i + " " + parent[i]);
+
+		int v = vertexCnt;
+		while (v != k) { // start를 만날때까지
+			System.out.print(v + " ");
+			v = parent[v];
+		}
+		System.out.println(v + " ");
 	}
 }
