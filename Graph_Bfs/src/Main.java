@@ -5,7 +5,7 @@ import java.util.Scanner;
 
 public class Main {
 	public static void main(String[] args) throws IOException {
-		Scanner sc = new Scanner(new File("problem4.in"));
+		Scanner sc = new Scanner(new File("test.in"));
 		FileWriter wr = new FileWriter(new File("result.out"));
 		int tc = sc.nextInt();
 
