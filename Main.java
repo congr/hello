@@ -27,6 +27,7 @@ public class Main {
 		}
 		
 		sc.close();
+		wr.close();
 	}
 	
 	class Solution {
