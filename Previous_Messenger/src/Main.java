@@ -1,4 +1,3 @@
-import java.awt.Point;
 import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
@@ -42,10 +41,10 @@ public class Main {
 	}
 
 	class Solution {
-		class point {
+		class Point {
 			int x, y;
 
-			public point(int x, int y) {
+			public Point(int x, int y) {
 				this.x = x;
 				this.y = y;
 			}
