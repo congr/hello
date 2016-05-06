@@ -19,7 +19,7 @@ public class Main {
 			for (int i = 0; i < eCnt; i++) {
 				dfs.addEdge(sc.nextInt(), sc.nextInt());
 			}
-			dfs.printVertices();
+			dfs.printAdjList();
 			dfs.goDfs(1);
 		}
 
@@ -65,7 +65,7 @@ public class Main {
 			}
 		}
 
-		void printVertices() {
+		void printAdjList() {
 			System.out.println("\nprint adjList");
 			for (int i = 1; i < vCnt + 1; i++) {
 				System.out.print(i + " -> ");
