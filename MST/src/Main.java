@@ -41,9 +41,9 @@ public class Main {
 
 		class Edge {
 			int from, to;
-			double weight;
+			int weight;
 
-			Edge(int f, int t, double w) {
+			Edge(int f, int t, int w) {
 				from = f;
 				to = t;
 				weight = w;
@@ -108,7 +108,7 @@ public class Main {
 			}
 		}
 
-		void addEdge(int v1, int v2, double weight) {
+		void addEdge(int v1, int v2, int weight) {
 			adjList[v1].add(new Edge(v1, v2, weight));
 			adjList[v2].add(new Edge(v2, v1, weight));
 		}
