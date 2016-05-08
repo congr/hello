@@ -28,11 +28,10 @@ public class Main {
 	}
 
 	class Dfs {
-		int size;
-		int vCnt;
-		int eCnt;
-		ArrayList<Integer>[] adjList;// 인접 리스트.
-		boolean visited[];
+		private final int vCnt;
+		private final int eCnt;
+		private ArrayList<Integer>[] adjList;// 인접 리스트.
+		private boolean visited[];
 
 		public Dfs(int vCnt, int eCnt) {
 			this.vCnt = vCnt;
@@ -46,7 +45,7 @@ public class Main {
 			}
 		}
 
-		int route[] = new int[vCnt + 1];
+		//int route[] = new int[vCnt + 1];
 
 		void addEdge(int v1, int v2) {
 			adjList[v1].add(v2);
