@@ -68,14 +68,17 @@ public class Main {
 			int maxCount = 0;
 
 			for (int i = START; i <= vCnt; i++) {
-				for (int j = START; j <= vCnt; j++) {
-					if (i < j && adjMatrix[i][j] == 0) {
-						// System.out.println(i + " " + j);
+				for (int j = i + 1; j <= vCnt; j++) {
+					if (adjMatrix[i][j] == 0) {
+						//System.out.println(i + " " + j);
 
 						adjMatrix[i][j] = 2; // 임의로 간선을 연결해서 삼각형 카운트.
 						count = 0; // 카운트 초기화.
 						for (int k = START; k <= vCnt; k++) {
-							// System.out.println(i + " " + j + " " + k);
+							if (i == j || j == k || k == i)// 세점중 같은 점이 있다면 스킵
+								continue;
+
+							//System.out.println(i + " " + j + " " + k);
 
 							// (i->j) (j->k) (k->i) 로 삼각형이 되는 형상
 							if (adjMatrix[i][j] > 0 && adjMatrix[j][k] > 0 && adjMatrix[k][i] > 0)
@@ -83,10 +86,10 @@ public class Main {
 						}
 
 						if (count > 0) {
-							System.out.println("count: " + count);
+							//System.out.println("count: " + count);
 							maxCount = Math.max(count, maxCount);
 						}
-						
+
 						adjMatrix[i][j] = 0;
 					}
 				}
@@ -115,7 +118,7 @@ public class Main {
 									// 카운트했음)
 						maxCount = Math.max(count, maxCount);
 					}
-					
+
 					adjMatrix[i][j] = 0;
 				}
 			}
