@@ -22,7 +22,7 @@ public class Main {
 				sol.addNode(p1);
 			}
 			
-			sol.travalse();
+			sol.traversal();
 
 			// File write
 			wr.write(" ");
@@ -40,36 +40,74 @@ public class Main {
 			public Node(int data) {
 				this.data = data;
 			}
+			
+			void insert(int data) {
+				//System.out.println("insert " + data );
+				if (this.data > data) {
+					if (left == null)
+						left = new Node(data);
+					else 
+						left.insert(data);
+				} else if (this.data < data) {
+					if (right == null)
+						right = new Node(data);
+					else 
+						right.insert(data);
+				} else {
+					// tree doesn't allow duplication
+				}
+			}
 		}
 
 		class BinTree {
 			Node root;
 
-			void insert(int data, Node node) {
+			void insert(int data) {
 				if (root == null) {
 					root = new Node(data);
 					return;
 				}
-
-				Node next = node;
-				if (node.data > data) { // left go
-					next = node.left;
-				} else { // right
-					next = node.right;
-				}
+				root.insert(data);
+			}
+			
+			Node search(int target, Node node) {
+				if (node == null) return null;
 				
-				if (next == null) {
-					next = new Node(data);
-				}else 
-				insert(data, next);
+				if (node.data > target)
+					search(target, node.left);
+				else if (node.data < target)
+					search(target, node.right);
+				
+				return node;
 			}
 
-			void inorder(Node next) {
+			void preorder(Node next) {
+				if (next == null)
+					return;
+				
 				System.out.print(next.data + " ");
-
+				preorder(next.left);
+				preorder(next.right);
+			}
+			
+			void inorder(Node next) {
+				if (next == null)
+					return;
+				
 				inorder(next.left);
+				System.out.print(next.data + " ");
 				inorder(next.right);
 			}
+
+			void postorder(Node next) {
+				if (next == null)
+					return;
+				
+				postorder(next.left);
+				postorder(next.right);
+				System.out.print(next.data + " ");
+			}
+
 		}
 
 		BinTree tree;
@@ -79,12 +117,19 @@ public class Main {
 		}
 
 		public void addNode(int data) {
-			tree.insert(data, tree.root);
+			tree.insert(data);
 		};
 
-		public void travalse() {
-			System.out.println("Inorder");
+		public void traversal() {
+			System.out.println("preorder");
+			tree.preorder(tree.root);
+			
+			System.out.println("\ninorder");
 			tree.inorder(tree.root);
+			
+			System.out.println("\npostorder");
+			tree.postorder(tree.root);
+			
 		}
 	}
 }
