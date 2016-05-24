@@ -21,7 +21,7 @@ public class Main {
 				// int p2 = sc.nextInt();
 				sol.addNode(p1);
 			}
-			
+
 			sol.traversal();
 
 			// File write
@@ -40,18 +40,18 @@ public class Main {
 			public Node(int data) {
 				this.data = data;
 			}
-			
+
 			void insert(int data) {
-				//System.out.println("insert " + data );
+				// System.out.println("insert " + data );
 				if (this.data > data) {
 					if (left == null)
 						left = new Node(data);
-					else 
+					else
 						left.insert(data);
 				} else if (this.data < data) {
 					if (right == null)
 						right = new Node(data);
-					else 
+					else
 						right.insert(data);
 				} else {
 					// tree doesn't allow duplication
@@ -69,31 +69,32 @@ public class Main {
 				}
 				root.insert(data);
 			}
-			
+
 			Node search(int target, Node node) {
-				if (node == null) return null;
-				
+				if (node == null)
+					return null;
+
 				if (node.data > target)
 					search(target, node.left);
 				else if (node.data < target)
 					search(target, node.right);
-				
+
 				return node;
 			}
 
 			void preorder(Node next) {
 				if (next == null)
 					return;
-				
+
 				System.out.print(next.data + " ");
 				preorder(next.left);
 				preorder(next.right);
 			}
-			
+
 			void inorder(Node next) {
 				if (next == null)
 					return;
-				
+
 				inorder(next.left);
 				System.out.print(next.data + " ");
 				inorder(next.right);
@@ -102,7 +103,7 @@ public class Main {
 			void postorder(Node next) {
 				if (next == null)
 					return;
-				
+
 				postorder(next.left);
 				postorder(next.right);
 				System.out.print(next.data + " ");
@@ -123,13 +124,13 @@ public class Main {
 		public void traversal() {
 			System.out.println("preorder");
 			tree.preorder(tree.root);
-			
+
 			System.out.println("\ninorder");
 			tree.inorder(tree.root);
-			
+
 			System.out.println("\npostorder");
 			tree.postorder(tree.root);
-			
+
 		}
 	}
 }
