@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
 
+//http://www.geeksforgeeks.org/find-lca-in-binary-tree-using-rmq/
+//https://www.topcoder.com/community/data-science/data-science-tutorials/range-minimum-query-and-lowest-common-ancestor/
+
 public class Main {
 
 	public static void main(String[] args) throws IOException {
@@ -86,13 +89,13 @@ public class Main {
 		}
 
 		// 오일러 투어를 DFS로 해서 오일러투어 Array와 level Array를 채우고, 각 정점이 처음 방문된
-		// firstVisit[]을 만든다.
+		// firstVisit[]을 만든다. l
 		SegmentTree stree;
 
 		void goEuler() {
 			ind = 0;
-			Arrays.fill(eulerTour, 0);
-			Arrays.fill(eulerLevel, 0);
+			// Arrays.fill(eulerTour, 0);
+			// Arrays.fill(eulerLevel, 0);
 			goDfs(1);
 
 			System.out.println("\neulerTour ");
@@ -107,11 +110,12 @@ public class Main {
 				System.out.print(firstVisit[i] + " ");
 			}
 
+			// 레벨을 이용해 세그먼트 트리로 최소레벨값을 찾는 RMQ를 할 수 있도록한다.
 			stree = new SegmentTree(eulerLevel);
 
 		}
 
-		int query(int from, int to) {
+		void query(int from, int to) {
 			System.out.println("\nquery " + from + " " + to);
 			int startRange = Math.min(firstVisit[from], firstVisit[to]);
 			int endRange = Math.max(firstVisit[from], firstVisit[to]);
@@ -124,9 +128,38 @@ public class Main {
 					"eulerLevel: " + lowestLevel + " => lca (" + from + ", " + to + ") = " + eulerTour[lcaIndex]);
 
 			// distance
-			// int distance = from level + to level - 2*lca level
+			int distance = eulerLevel[from] + eulerLevel[to] - 2 * eulerLevel[lcaIndex];
+			int tripDist = 0;
+			int midNode = 0;
+			
+			
+			if (eulerLevel[from] == eulerLevel[to])
+				midNode = eulerTour[lcaIndex];
+			else {
+				if (eulerLevel[from] < eulerLevel[to])
+					tripDist = (int) Math.ceil(distance / 2);
+				else
+					tripDist = distance / 2;
+				
+				midNode = goback(tripDist, to);
+			}
+			
+			System.out.println(distance +" " +midNode);
+		}
 
-			return -1;
+		// <- 방향으로 array를 거슬러 가는데, tripDist 카운트 만큼 레벨이 낮아지는 지점을 리턴
+		int goback(int tripDist, int sIndex) {
+
+			int level = eulerLevel[sIndex] - 1;
+			int i = sIndex;
+			while (i < tripDist) {
+				if (eulerLevel[i] == level) {
+					i--;
+					level--;
+				}
+			}
+
+			return eulerTour[i];
 		}
 
 		// segment tree 에서 최소값을 갖는 인덱스는 찾을 수 없어서, 최소값을 갖는 배열의 인덱스를 다시 찾는다.
