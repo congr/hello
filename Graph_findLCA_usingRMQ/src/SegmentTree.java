@@ -42,22 +42,28 @@ public class SegmentTree {
      * Time-Complexity:  O(n*log(n))
      *
      * @param array the Initialization array
+     * @throws Exception 
      */
-    public SegmentTree(int[] array) {
+    public SegmentTree(int[] array){
         this.array = Arrays.copyOf(array, array.length);
         //The max size of this array is about 2 * 2 ^ log2(n) + 1
         size = (int) (2 * Math.pow(2.0, Math.floor((Math.log((double) array.length) / Math.log(2.0)) + 1)));
         heap = new Node[size];
         build(1, 0, array.length);
-        orgIndex = 0;
     }
  
+    public SegmentTree(int[] array, int length){
+        this.array = Arrays.copyOf(array, length);
+        //The max size of this array is about 2 * 2 ^ log2(n) + 1
+        size = (int) (2 * Math.pow(2.0, Math.floor((Math.log((double) array.length) / Math.log(2.0)) + 1)));
+        heap = new Node[size];
+        build(1, 0, array.length);
+    }
  
     public int size() {
         return array.length;
     }
  
-    int orgIndex;
     //Initialize the Nodes of the Segment tree
     private void build(int v, int from, int size) {
         heap[v] = new Node();
@@ -67,6 +73,7 @@ public class SegmentTree {
         if (size == 1) {
             heap[v].sum = array[from];
             heap[v].min = array[from];
+            heap[v].minOwner = array[from];
         } else {
             //Build childs
             build(2 * v, from, size / 2);
@@ -75,6 +82,13 @@ public class SegmentTree {
             heap[v].sum = heap[2 * v].sum + heap[2 * v + 1].sum;
             //min = min of the children
             heap[v].min = Math.min(heap[2 * v].min, heap[2 * v + 1].min);
+            
+            // minOwner = min값을 갖고 있는 child의 원래 배열 인덱스.
+            if (heap[2 * v].min > heap[2 * v + 1].min)
+            	heap[v].minOwner = heap[2 * v + 1].minOwner;
+            else {
+            	heap[v].minOwner = heap[2 * v].minOwner;
+            }
         }
     }
  
@@ -143,6 +157,38 @@ public class SegmentTree {
         return Integer.MAX_VALUE;
     }
  
+    
+    // TODO : min값을 갖는 index도 저장해서, node를 리턴하자.
+   /* public Node minNode(int from, int to) {
+    	return minNode(1, from, to);
+    }
+    
+    private Node minNode(int v, int from, int to) {
+        Node n = heap[v];
+ 
+ 
+        //If you did a range update that contained this node, you can infer the Min value without going down the tree
+        if (n.pendingVal != null && contains(n.from, n.to, from, to)) {
+            return n;
+        }
+ 
+        if (contains(from, to, n.from, n.to)) {
+            return heap[v];
+        }
+ 
+        if (intersects(from, to, n.from, n.to)) {
+            propagate(v);
+            int leftMin = RMinQ(2 * v, from, to);
+            int rightMin = RMinQ(2 * v + 1, from, to);
+ 
+            if (leftMin < rightMin)
+            	return heap[2*v];
+            else 
+            	return heap[2*v+1];
+        }
+ 
+        return null;
+    }*/
  
     /**
      * Range Update Operation.
@@ -225,14 +271,14 @@ public class SegmentTree {
     }
  
     //The Node class represents a partition range of the array.
-    static class Node {
+    public class Node {
         int sum;
         int min;
         //Here We store the value that will be propagated lazily
         Integer pendingVal = null;
         int from;
         int to;
-        int index;
+        int minOwner; // min값을 갖는 최초 배열 인덱스. min값 주인.
  
         int size() {
             return to - from + 1;
