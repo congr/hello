@@ -14,12 +14,12 @@ public class Main {
 			// input tc #
 			int N = sc.nextInt();
 			int K = sc.nextInt();
-			int W = sc.nextInt();
 			
-			Solution sol = m.new Solution();
+			Solution sol = m.new Solution(N);
 			for (int i = 0; i < N; i++) {
 				int p1 = sc.nextInt();
 				int p2 = sc.nextInt();
+				sol.addEdge(p1, p2);
 			}
 			
 			// File write
@@ -31,7 +31,12 @@ public class Main {
 	}
 	
 	class Solution {
-		public Solution() {
+		int size;
+		public Solution(int n) {
+			this.size = n;
+		}
+		
+		void addEdge(int x, int y) {
 			
 		}
 	}
