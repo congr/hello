@@ -43,6 +43,7 @@ public class GrahamScan {
     
     // arrList 로 넘기도록 생성자 추가
     public GrahamScan(ArrayList<Point2D> arrList) {
+    	hull.clear();
     	// defensive copy
         int N = arrList.size();
         Point2D[] points = new Point2D[N];
@@ -86,7 +87,8 @@ public class GrahamScan {
     }
     
     public GrahamScan(Point2D[] pts) {
-
+    	hull.clear();
+    	
         // defensive copy
         int N = pts.length;
         Point2D[] points = new Point2D[N];

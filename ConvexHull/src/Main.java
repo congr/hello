@@ -1,6 +1,7 @@
 import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -9,8 +10,8 @@ import java.util.Scanner;
 public class Main {
 
 	public static void main(String[] args) throws Exception {
-		// Scanner sc = new Scanner(new File("p3-s01.in"));
-		Scanner sc = new Scanner(new File("sample.in"));
+		Scanner sc = new Scanner(new File("p3-s01.in"));
+//		 Scanner sc = new Scanner(new File("sample.in"));
 		FileWriter wr = new FileWriter(new File("problem.out"));
 		Main m = new Main();
 
@@ -34,8 +35,30 @@ public class Main {
 		wr.close();
 	}
 
+	private static class XOrder implements Comparator<Point2D> {
+		public int compare(Point2D p, Point2D q) {
+			if (p.x() < q.x())
+				return -1;
+			if (p.x() > q.x())
+				return +1;
+			return 0;
+		}
+	}
+
+	// compare points according to their y-coordinate
+	private static class YOrder implements Comparator<Point2D> {
+		public int compare(Point2D p, Point2D q) {
+			if (p.y() < q.y())
+				return -1;
+			if (p.y() > q.y())
+				return +1;
+			return 0;
+		}
+	}
+
 	class Solution {
 		ArrayList<Point2D> pointsList = new ArrayList<Point2D>();
+		ArrayList<Point2D> pointsListX = new ArrayList<Point2D>();
 
 		int N;
 		int ind;
@@ -49,21 +72,31 @@ public class Main {
 		}
 
 		void solve() {
-			// convex hull을 통해 가장 긴 거리 점을 찾고 하나씩 먼점 위주로 삭제해감.
-			removeFarthestPoint();
-			removeFarthestPoint();
-			removeFarthestPoint();
+			// pointsListX.addAll(pointsList);
 
-			System.out.println(findRectangle(pointsList, null));
+			pointsList.sort(new YOrder());
+			// pointsListX.sort(new YOrder());
+
+			// convex hull을 통해 가장 긴 거리 점을 찾고 하나씩 먼점 위주로 삭제해감.
+			int size = pointsList.size();
+			int removed = 0;
+			while (removed < 3) {
+				removeFarthestPoint();
+				removed = (size - pointsList.size());
+//				 System.out.println(removed + " removed");
+			}
+
+			System.out.println(findRectangleEdge(pointsList, null));
 		}
 
 		// 최대 정사각형 변의 길이를 리턴
-		int findRectangle(ArrayList<Point2D> al, Point2D na) {
-			int minX = 0, maxX = 0, minY = 0, maxY = 0;
+		int findRectangleEdge(ArrayList<Point2D> al, Point2D na) {
+			int minX = Integer.MAX_VALUE, maxX = Integer.MIN_VALUE, minY = Integer.MAX_VALUE, maxY = Integer.MIN_VALUE;
 
 			for (int i = 0, len = al.size(); i < len; i++) {
 				Point2D p = al.get(i);
-				if (na == p) continue; // na 점은 제외하고 사각형 찾기
+				if (na == p)
+					continue; // na 점은 제외하고 사각형 찾기
 
 				maxX = (int) Math.max(p.x(), maxX);
 				minX = (int) Math.min(p.x(), minX);
@@ -78,23 +111,58 @@ public class Main {
 			return Math.max(a, b);
 		}
 
-		private class HullDist{
+		int expectRectangle(ArrayList<Point2D> al, Point2D na) {
+			int minX = Integer.MAX_VALUE, maxX = Integer.MIN_VALUE, minY = Integer.MAX_VALUE, maxY = Integer.MIN_VALUE;
+
+			for (int i = 0, len = al.size(); i < len; i++) {
+				Point2D p = al.get(i);
+				if (na == p)
+					continue; // na 점은 제외하고 사각형 찾기
+
+				maxX = (int) Math.max(p.x(), maxX);
+				minX = (int) Math.min(p.x(), minX);
+
+				maxY = (int) Math.max(p.y(), maxY);
+				minY = (int) Math.min(p.y(), minY);
+			}
+
+			int a = Math.abs(maxX - minX);
+			int b = Math.abs(maxY - minY);
+
+			int d = Math.max(a, b);
+			return d * d;
+		}
+
+		private class HullDist implements Comparable<HullDist> {
 			double dist;
 			int hullInd;
-			
-			HullDist(double dist, int ind){
+			Point2D from;
+			Point2D to;
+
+			HullDist(double dist, int ind, Point2D from, Point2D to) {
 				this.dist = dist;
 				this.hullInd = ind;
+				this.from = from;
+				this.to = to;
+			}
+
+			@Override
+			public int compareTo(HullDist o) {
+				if (this.dist > o.dist)
+					return -1;
+				else if (this.dist < o.dist)
+					return 1;
+				return 0;
 			}
 		}
-		
+
 		void fillDist(ArrayList<HullDist> dist, GrahamScan gs) {
 			Point2D p = null, fp = null; // firstP
 			int i = 0;
 			for (Point2D q : gs.hullOrg()) {
 				if (p != null) { // 처음 점부터 두번째 점까지 거리를 [0]에 저장
 					double d = p.distanceTo(q);
-					dist.add(new HullDist(d, i++));
+					dist.add(new HullDist(d, i++, p, q));
 				} else {
 					fp = q; // 처음 점을 저장.
 				}
@@ -104,30 +172,109 @@ public class Main {
 			// 마지막 점에서 처음 점으로의 거리를 dist[i] 마지막 인덱스에 저장
 			Point2D q = fp;
 			double d = p.distanceTo(q);
-			dist.add(new HullDist(d, i));
+			dist.add(new HullDist(d, i, p, q));
 		}
 
-
-		void removeFarthestPoint(){
+		void removeFarthestPoint() {
+			// convex hull
 			GrahamScan gs = new GrahamScan(pointsList);
-			int distSize = gs.getHullSize();
 			ArrayList<HullDist> dist = new ArrayList<HullDist>();
+			ArrayList<HullDist> distOrg = new ArrayList<HullDist>();
+			// 점간 거리 계산해서 dist에 채움.
 			fillDist(dist, gs);
-			
-			Collections.sort(dist, new Comparator<HullDist>() {
-				@Override
-				public int compare(HullDist o1, HullDist o2) {
-					if(o1.dist > o1.dist) return -1;
-					else if (o1.dist < o1.dist) return 1;
-					
-					return 0;
+			distOrg.addAll(dist);
+
+			Collections.sort(dist);
+
+			int i = 0;
+			HullDist hd = dist.get(i);
+			HullDist hd2 = dist.get(i + 1);
+			if (hd.dist == hd2.dist) { // 가장 긴 간선 두개가 길이가 같다면, 면적 비교.
+				while (hd.dist == hd2.dist) {
+					int test[] = new int[4];
+					int a = test[0] = expectRectangle(pointsList, hd.from);
+					int b = test[1] = expectRectangle(pointsList, hd.to);
+					int c = test[2] = expectRectangle(pointsList, hd2.from);
+					int d = test[3] = expectRectangle(pointsList, hd2.to);
+
+					// 면적이 가장 작아 지는 점을 제거.
+					Arrays.sort(test); // 오름차순으로 소팅.
+
+					if (test[0] == a)
+						pointsList.remove(hd.from);
+					if (test[0] == b)
+						pointsList.remove(hd.to);
+					if (test[0] == c)
+						pointsList.remove(hd2.from);
+					if (test[0] == d)
+						pointsList.remove(hd2.to);
+
+					i++;
+					if (i >= dist.size() - 1)
+						break;
+					hd = dist.get(i);
+					hd2 = dist.get(i + 1);
 				}
+			} else {
+				checkDistance(gs, hd.hullInd, distOrg);
 				
-			});
-			
-			
+				
+
+			}
 		}
-		
+
+		void checkDistance(GrahamScan gs, int longestEdgeInd, ArrayList<HullDist> dist) {
+			int distSize = gs.getHullSize();
+			Point2D pToDel = dist.get(longestEdgeInd).from, qToDel = dist.get(longestEdgeInd).to;
+
+//			pointsList.sort(pToDel.distanceToOrder());
+//			pointsList.remove(0);
+//			pointsList.remove(1);
+//			pointsList.sort(qToDel.distanceToOrder());
+//			pointsList.remove(0);
+//			pointsList.remove(1);
+			
+			
+			// 가장긴 간선에서 서로 이전/다음 간선 중 더 긴 간선에 연결된 점은 제거
+			// 즉, 가장 멀리 떨어진 점을 제거하여 다시 convex hull루틴 실행
+			int a = longestEdgeInd - 1, b = longestEdgeInd + 1; // longestEdgeInd를
+																// 기준으로
+																// 앞간선길이a/뒤간선길이b
+			if (longestEdgeInd == 0) {
+				a = distSize - 1;// 배열 마지막 인덱스
+				b = 1;
+			} else if (longestEdgeInd == distSize - 1) { // 배열 마지막 인덱스라면,
+				a = longestEdgeInd - 1; //
+				b = 0; // 다음으로 0
+			}
+
+//			if (dist.get(a).dist > dist.get(b).dist) // remove p point
+//				pointsList.remove(pToDel);
+//			else if (dist.get(a).dist < dist.get(b).dist) // remove q point
+//				pointsList.remove(qToDel);
+//			else { // 길이가 같으면 제거될 면적으로 비교
+//				int expectA = expectRectangle(pointsList, pToDel);
+//				int expectB = expectRectangle(pointsList, qToDel);
+//				
+//				if (expectA > expectB)
+//					pointsList.remove(qToDel);
+//				else
+//					pointsList.remove(pToDel);
+//			}
+			
+			int expectA = findRectangleEdge(pointsList, pToDel);
+			int expectB = findRectangleEdge(pointsList, qToDel);
+			
+			if (expectA > expectB)
+				pointsList.remove(qToDel);
+			else if (expectA < expectB)
+				pointsList.remove(pToDel);
+			else {
+				pointsList.remove(qToDel);
+				pointsList.remove(pToDel);
+			}
+		}
+
 		void removeFarthestPoint2() {
 			GrahamScan gs = new GrahamScan(pointsList);
 			int distSize = gs.getHullSize();
@@ -147,7 +294,7 @@ public class Main {
 						pToDel = p;
 						qToDel = q;
 					} else if (d == maxDist) {
-						
+
 					}
 					dist[i++] = d;
 				} else {
@@ -183,9 +330,9 @@ public class Main {
 			else if (dist[a] < dist[b]) // remove q point
 				pointsList.remove(qToDel);
 			else { // 길이가 같으면 제거될 면적으로 비교
-				int expectA = findRectangle(pointsList, pToDel);
-				int expectB = findRectangle(pointsList, qToDel);
-				
+				int expectA = expectRectangle(pointsList, pToDel);
+				int expectB = expectRectangle(pointsList, qToDel);
+
 				if (expectA > expectB)
 					pointsList.remove(qToDel);
 				else
