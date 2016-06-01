@@ -112,7 +112,7 @@ public class Main {
 			double b = (maxY - minY);
 			
 //				System.out.println(a + " " + b);
-			return Math.max(a, b);
+			return Math.min(a, b);
 		}
 
 		double expectRectangle(ArrayList<Point2D> al, Point2D na) {
@@ -259,8 +259,8 @@ public class Main {
 //					pointsList.remove(pToDel);
 //			}
 			
-			double expectA = findRectangleEdge(pointsList, pToDel);
-			double expectB = findRectangleEdge(pointsList, qToDel);
+			double expectA = expectRectangle(pointsList, pToDel);
+			double expectB = expectRectangle(pointsList, qToDel);
 			
 			if (expectA > expectB) {
 //				System.out.println(qToDel + " removed");
