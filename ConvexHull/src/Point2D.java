@@ -143,6 +143,13 @@ public final class Point2D implements Comparable<Point2D> {
         double dy = this.y - that.y;
         return Math.sqrt(dx*dx + dy*dy);
     }
+    
+    public double distanceSquareRectTo(Point2D that) {
+        double dx = this.x - that.x;
+        double dy = this.y - that.y;
+        double d = Math.max(dx, dy);
+        return Math.sqrt(dx*dx + dy*dy);
+    }
 
     /**
      * Returns the square of the Euclidean distance between this point and that point.
