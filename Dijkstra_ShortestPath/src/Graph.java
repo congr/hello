@@ -29,39 +29,39 @@ public class Graph {
 	}
 
 	// BFS template 차이는.: pq 사용, weight비교후 더 높은 weight를 가진 간선 방문 안함.
-	double [] goDijkstra() {
-		PriorityQueue<Edge> pq = new PriorityQueue<Edge>(vCnt, new Comparator<Edge>(){
+	double[] goDijkstra() {
+		PriorityQueue<Edge> pq = new PriorityQueue<Edge>(vCnt, new Comparator<Edge>() {
 
 			@Override
 			public int compare(Edge o1, Edge o2) {
-				if (o1.w > o2.w) return 1;
-				else if (o1.w > o2.w) return -1;
+				if (o1.w > o2.w)
+					return 1;
+				else if (o1.w > o2.w)
+					return -1;
 				return 0;
 			}
 		});
-		
+
 		// 시작점에 해당하는 Edge
-		//Edge first = adjList[1].get(0);
-		pq.add(new Edge(1,1,0));
-		edgeTo[1] = 0; // previous edge (parent)
+		pq.add(new Edge( 1, 0));
+		edgeTo[1] = 1; // previous edge (parent)
 		distTo[1] = 0; // weight
 
 		while (!pq.isEmpty()) {
 			Edge hereE = pq.poll();
 			int here = hereE.v;
 			double cost = hereE.w;
-			
+
 			if (distTo[here] < cost) // 이미 이전에 방문했는데, 더 작은 w가 아니면 pq추가할 필요없다
-				continue;
+				continue; // 큐에서 꺼내서 무시
 			System.out.println(here + " " + distTo[here]);
-			
+
 			// 인접한 정점들을 검사.
-			for (int i = 0, len = adjList[here].size(); i < len; i++) {
-				Edge nextE = adjList[here].get(i);
-				int next = nextE.v;
-				double nextDist = cost + nextE.w;
+			for (Edge e: adjList[here]) {
+				int next = e.v;
+				double nextDist = cost + e.w;
 				if (distTo[next] > nextDist) {
-					pq.add(nextE);
+					pq.add(new Edge(next, nextDist));
 					edgeTo[next] = here;
 					distTo[next] = nextDist;
 				}
@@ -72,8 +72,8 @@ public class Graph {
 	}
 
 	void addEdge(int u, int v, double w) {
-		adjList[u].add(new Edge(u, v, w));
-		adjList[v].add(new Edge(v, u, w));
+		adjList[u].add(new Edge(v, w));
+		adjList[v].add(new Edge(u, w));
 	}
 
 	void printAdjList() {
@@ -89,10 +89,10 @@ public class Graph {
 	void printShortestPath() {
 		System.out.println("\nprint ShortestPath");
 		for (int i = START; i < vCnt + 1; i++) {
-			System.out.println(i + " "+ edgeTo[i] + " " +distTo[i]);
+			System.out.println(i + " " + edgeTo[i] + " " + distTo[i]);
 		}
 	}
-	
+
 	boolean debug = true;
 
 	void println(String x) { // DFS 에 쓰면 stackoverflow주의.
@@ -105,22 +105,20 @@ public class Graph {
 			System.out.print(x + " ");
 	}
 
-	public class Edge { 
-	    int u;
-	    int v;
-	    double w;
-	    
-	    public Edge(int u, int v, double w) {
-	    	this.u = u; // 쓸일이 없다. 배열 인덱스 자체가 u값과 같음.
-	    	this.v = v;
-	    	this.w = w;
-	    }
-	    
-	    public String toString() {
-	    	return v + " (" + w + ")";
-	    }
+	public class Edge {
+		int v;
+		double w;
+
+		public Edge(int v, double w) {
+			this.v = v;
+			this.w = w;
+		}
+
+		public String toString() {
+			return v + " (" + w + ")";
+		}
 	}
-	
+
 	public static void main(String[] args) throws Exception {
 		Scanner sc = new Scanner(new File("sample.in"));
 		FileWriter wr = new FileWriter(new File("problem.out"));
@@ -130,7 +128,7 @@ public class Graph {
 			// input tc #
 			int N = sc.nextInt();
 			int K = sc.nextInt();
-			
+
 			Graph g = new Graph(N);
 			for (int i = 0; i < K; i++) {
 				int u = sc.nextInt();
@@ -140,7 +138,7 @@ public class Graph {
 			}
 
 			g.printAdjList();
-			
+
 			g.goDijkstra();
 			g.printShortestPath();
 		}
@@ -148,5 +146,5 @@ public class Graph {
 		sc.close();
 		wr.close();
 	}
-	
+
 }
