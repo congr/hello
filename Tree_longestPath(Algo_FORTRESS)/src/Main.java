@@ -76,7 +76,7 @@ public class Main {
 
 			// 자식이 없다면 h =0 return; - base case
 			for (int child : circles[node].children) {
-				h = Math.max(h, height(circles, child));
+				h = Math.max(h, height(circles, child) + 1);
 			}
 
 			return h;

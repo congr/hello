@@ -5,23 +5,24 @@ import java.util.*;
 
 public class Main {
 
-	public static int[] bucketSort(int[] arr, String str) {
-        int i, j;
-        int[] count = new int[arr.length];
-        
-        Arrays.fill(count, 0);
+//	public static int[] bucketSort(int[] arr, String str) {
+//		int i, j;
+//		int[] count = new int[arr.length];
+//
+//		Arrays.fill(count, 0);
+//
+//		for (i = 0; i < arr.length; i++) {
+//			count[arr[i]]++;
+//		}
+//
+//		for (i = 0, j = 0; i < count.length; i++) {
+//			for (; count[i] < 0; (count[i])--) {
+//				arr[j++] = i;
+//			}
+//		}
+//		return arr;
+//	}
 
-        for (i = 0; i < arr.length; i++) {
-            count[arr[i]]++;
-        }
-
-        for (i = 0, j = 0; i < count.length; i++) {
-            for (; count[i] < 0; (count[i])--) {
-                arr[j++] = i;
-            }
-        }
-        return arr;
-    }
 	// sort suffixes of S in O(n*log(n))
 	public static int[] suffixArray(CharSequence S) {
 		int n = S.length();
@@ -30,7 +31,7 @@ public class Main {
 			order[i] = n - 1 - i;
 
 		// stable sort of characters
-		//bucketSort(order);
+		// bucketSort(order);
 		Arrays.sort(order, (a, b) -> Character.compare(S.charAt(a), S.charAt(b)));
 
 		int[] sa = new int[n];
@@ -158,8 +159,7 @@ public class Main {
 		int maxLen = 0;
 		for (int i = 0, l = str.length(); i + k <= l; i++) {
 			maxLen = Math.max(maxLen, commonPrefixLen(str, sa[i], sa[i + k - 1]));
-			// System.out.println("cpl" +" "+ commonPrefixLen(str, sa[i],
-			// sa[i+k-1]));
+			//System.out.println("cpl" + " " + commonPrefixLen(str, sa[i], sa[i + k - 1]));
 		}
 
 		return maxLen;
@@ -175,50 +175,25 @@ public class Main {
 			String str = sc.next();
 
 			int[] sa = suffixArray(str);
-			// int i = 0;
-			// for (int p : sa) {
-			// System.out.println(i + " " + str.substring(p));
-			// i++;
-			// }
+			int i = 0;
+			int c = 0;
+			for (int p : sa) {
+				i++;
+				System.out.println("----"+ i+ "----");
+				String sub = str.substring(p);
+				for (int j =1; j< sub.length(); j++) {
+					System.out.println(c++ + " " +sub.substring(0, j));
+				}
+				System.out.println(c++ + " " + sub);
+			}
 
 			int lcp[] = lcp(sa, str);
 			if (k == 1)
 				System.out.println(str.length());
 			else
-				System.out.println(kFrequentCommonPrefix(sa, lcp, str, k));
+				System.out.println(kFrequentCommonPrefix(sa, lcp, str, 2));
 		}
 
 		sc.close();
-
-		// String s1 = "banana";
-		// int[] sa1 = suffixArray(s1);
-		//
-		// // print suffixes in lexicographic order
-		// for (int p : sa1)
-		// System.out.println(s1.substring(p));
-		//
-		// System.out.println("lcp = " + Arrays.toString(lcp(sa1, s1)));
-
-		// random test
-		// Random rnd = new Random(1);
-		// for (int step = 0; step < 100000; step++) {
-		// int n = rnd.nextInt(100) + 1;
-		// StringBuilder s = new StringBuilder();
-		// for (int i = 0; i < n; i++)
-		// s.append((char) ('\1' + rnd.nextInt(10)));
-		// int[] sa = suffixArray(s);
-		// int[] ra = rotationArray(s.toString() + '\0');
-		// int[] lcp = lcp(sa, s);
-		// for (int i = 0; i + 1 < n; i++) {
-		// String a = s.substring(sa[i]);
-		// String b = s.substring(sa[i + 1]);
-		// if (a.compareTo(b) >= 0 || !a.substring(0,
-		// lcp[i]).equals(b.substring(0, lcp[i]))
-		// || (a + " ").charAt(lcp[i]) == (b + " ").charAt(lcp[i]) || sa[i] !=
-		// ra[i + 1])
-		// throw new RuntimeException();
-		// }
-		// }
-		// System.out.println("Test passed");
 	}
 }

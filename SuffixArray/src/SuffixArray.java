@@ -199,9 +199,9 @@ public class SuffixArray {
 			int cp = 0;
 			if (i > 0)
 				cp = suffixArray.lcp(i); // cp는 중
-			count += sLen - suffixArray.index(i) - cp;
-			// System.out.println(i+ " "+ s.length() + " "+ suffixArray.index(i)
-			// + " " + cp);
+			count += sLen - suffixArray.index(i);// - cp; // 중복제거 안
+			 System.out.println(i+ " "+ s.length() + " "+ suffixArray.index(i)
+			 + " " + cp);
 		}
 
 		return count;
